@@ -3,6 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\HomeController; // Keep if /home is still needed for admins?
+use App\Http\Controllers\ShareController;
+
+// ... otras rutas ...
 
 // Remove default welcome route if not used
 // Route::get('/', function () { return view('welcome'); });
@@ -24,3 +27,6 @@ Route::post('/upload', [ImageController::class, 'upload'])->name('images.upload'
 // Protected by 'auth' middleware. Only logged-in users can attempt.
 // Controller will verify if the specific user ('netraular') is allowed.
 Route::delete('/images/{image}', [ImageController::class, 'destroy'])->name('images.destroy')->middleware('auth');
+
+
+Route::get('/share', [ShareController::class, 'index'])->name('share');
