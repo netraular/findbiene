@@ -13,7 +13,10 @@ return new class extends Migration
     {
         Schema::create('images', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->string('path'); // Para guardar la ruta del archivo de imagen
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Quién subió la imagen
+            $table->text('description')->nullable(); // Opcional: descripción o lugar
+            $table->timestamps(); // created_at y updated_at
         });
     }
 
