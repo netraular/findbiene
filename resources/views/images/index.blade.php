@@ -12,7 +12,7 @@
             {{-- Game Title - Use Retro Font --}}
             <h1 class="display-5 fw-bold font-retro mb-3">Biene Hunt!</h1>
             <p class="lead fw-normal mb-4">Hack UPC 2025 Edition</p>
-            <h2 class="h4 fw-light">Spotted the Ghost? Upload your sighting!</h2>
+            <h2 class="h4 fw-light">Spotted Biene? Upload your sighting!</h2>
         </div>
     </section>
 

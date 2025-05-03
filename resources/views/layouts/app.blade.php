@@ -46,7 +46,8 @@
             flex-direction: column;
             min-height: 100vh;
             overflow-x: hidden; /* Prevent horizontal scrollbar from ghosts */
-            position: relative; /* Needed for absolute positioning of ghosts */
+            padding-bottom: 80px; /* <<< Space for fixed footer. Adjust height as needed */
+            position: relative; /* Needed for absolute/fixed children like overlay */
         }
 
         /* Ghost Animation Container */
@@ -59,6 +60,18 @@
             z-index: -1; /* Behind everything else */
             overflow: hidden; /* Ghosts shouldn't cause scrollbars */
             pointer-events: none; /* Prevent ghosts from blocking clicks */
+        }
+
+        /* Full Page Dark Overlay Styles */
+        #page-overlay {
+            position: fixed; /* Cover the entire viewport */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4); /* Black with 40% opacity - AJUSTA ESTE VALOR (0.0 a 1.0) */
+            z-index: 0; /* Above background animation (-1), below content (1) */
+            pointer-events: none; /* Allow clicks to go through to the content below */
         }
 
         #background-animation .ghost {
@@ -80,9 +93,9 @@
 
 
         #app {
-            flex: 1;
-            z-index: 1; /* Ensure content is above background animation */
-            position: relative; /* Needed for stacking context */
+            flex: 1; /* Allows content to fill space above fixed footer */
+            position: relative; /* Needed to establish stacking context for its children if any */
+            z-index: 1; /* Ensure #app content is above #page-overlay (z-index: 0) */
         }
 
         /* Use the retro font for specific elements */
@@ -94,7 +107,7 @@
 
         /* Hero Section Adjustments */
         .hero-section {
-             background: rgba(0, 0, 0, 0.3); /* Slightly darker overlay */
+             /* background: rgba(0, 0, 0, 0.3); <-- REMOVED - Overlay is now global via #page-overlay */
              color: #fff; /* Bright white */
              text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
              padding-top: 3rem;
@@ -117,7 +130,7 @@
              border-radius: 15px;
              padding: 2rem;
              box-shadow: 0 0 20px rgba(250, 204, 21, 0.3); /* Yellow glow */
-             margin-bottom: 3rem;
+             margin-bottom: 3rem; /* Keep margin so it doesn't touch the footer visually unless scrolled fully */
         }
         .upload-button {
             /* --- COLORFUL BUTTON --- */
@@ -171,6 +184,9 @@
             color: #60a5fa; /* Bright Blue heading */
             text-shadow: 1px 1px 3px rgba(96, 165, 250, 0.5);
         }
+        .gallery-section {
+             padding-bottom: 3rem; /* Add some padding below gallery title */
+        }
         /* Polaroid Effect for Dark Mode */
         .polaroid-effect {
             background-color: #374151; /* Dark grey card background */
@@ -194,12 +210,17 @@
 
         /* Footer Styling */
         footer {
-            background-color: rgba(17, 24, 39, 0.8); /* Very dark transparent */
+            position: fixed; /* <<< Make footer fixed */
+            bottom: 0;       /* <<< Stick to bottom */
+            left: 0;         /* <<< Align to left */
+            width: 100%;     /* <<< Span full width */
+            background-color: #111827; /* <<< CHANGED: Fully opaque dark color */
             font-size: 0.9em;
             color: #9ca3af; /* Grey text */
             border-top: 1px solid #374151; /* Dark border */
-            padding-top: 1rem;
-             padding-bottom: 1rem;
+            padding-top: 1rem; /* Keep existing padding */
+            padding-bottom: 1rem; /* Keep existing padding */
+            z-index: 1; /* Ensure footer is also above the overlay */
         }
         footer a {
             color: #60a5fa; /* Light blue links */
@@ -210,11 +231,11 @@
             color: #93c5fd; /* Lighter blue on hover */
             text-decoration: underline;
         }
-
         /* Modal Dark Mode Adjustments (Bootstrap 5 usually handles this well, but just in case) */
+        /* Modal z-index is handled by Bootstrap defaults now, should be > 1 */
         .modal-content {
-            background-color: #1f2937; /* Dark background for modal */
-            color: #e5e7eb; /* Light text */
+            background-color: #1f2937;
+            color: #e5e7eb;
         }
         .modal-header {
             border-bottom: 1px solid #374151; /* Dark border */
@@ -241,6 +262,9 @@
         {{-- Add more ghosts if desired --}}
     </div>
 
+    {{-- Full Page Dark Overlay --}}
+    <div id="page-overlay"></div>
+
     <div id="app">
         {{-- No Navbar --}}
         <main>
@@ -248,10 +272,10 @@
         </main>
     </div>
 
-    {{-- Footer --}}
-    <footer class="text-center mt-auto py-3">
+    {{-- Footer (now fixed position and opaque) --}}
+    <footer class="text-center py-3">
         <div class="container">
-            <p class="mb-1">Biene Hunt site for Hack UPC 2025 | Free domain via GoDaddy & MLH.</p>
+            <p class="mb-1">Biene Hunt site for Hack UPC 2025 | Used free domain from GoDaddy & MLH.</p>
             <p class="mb-0">Contact / More info: <a href="https://raular.com" target="_blank" rel="noopener noreferrer">raular.com</a></p>
         </div>
     </footer>
