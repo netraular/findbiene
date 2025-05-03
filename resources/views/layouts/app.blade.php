@@ -39,50 +39,49 @@
         body {
             /* --- DARK MODE BACKGROUND --- */
             background-color: #111827; /* Dark blue/grey */
-            /* Or a very dark: background-color: #0a0a1e; */
-            font-family: 'Poppins', sans-serif; /* Keep Poppins for readability */
+            font-family: 'Poppins', sans-serif;
             color: #e5e7eb; /* Light grey text */
             display: flex;
             flex-direction: column;
             min-height: 100vh;
             overflow-x: hidden; /* Prevent horizontal scrollbar from ghosts */
-            padding-bottom: 80px; /* <<< Space for fixed footer. Adjust height as needed */
-            position: relative; /* Needed for absolute/fixed children like overlay */
+            padding-bottom: 80px; /* Space for fixed footer */
+            position: relative;
         }
 
         /* Ghost Animation Container */
         #background-animation {
-            position: fixed; /* Keep ghosts fixed in viewport */
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1; /* Behind everything else */
-            overflow: hidden; /* Ghosts shouldn't cause scrollbars */
-            pointer-events: none; /* Prevent ghosts from blocking clicks */
+            z-index: -2; /* Behind everything */
+            overflow: hidden;
+            pointer-events: none;
         }
 
         /* Full Page Dark Overlay Styles */
         #page-overlay {
-            position: fixed; /* Cover the entire viewport */
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.4); /* Black with 40% opacity - AJUSTA ESTE VALOR (0.0 a 1.0) */
-            z-index: 0; /* Above background animation (-1), below content (1) */
-            pointer-events: none; /* Allow clicks to go through to the content below */
+            background-color: rgba(0, 0, 0, 0.4); /* Black with 40% opacity */
+            z-index: -1; /* Above background (-1), below content (1) */
+            pointer-events: none;
         }
 
         #background-animation .ghost {
             position: absolute;
-            width: 50px; /* Adjust size as needed */
+            width: 50px;
             height: auto;
-            opacity: 0.7; /* Start slightly transparent */
+            opacity: 0.7;
             animation: moveGhost 15s infinite alternate ease-in-out;
         }
 
-        /* Position ghosts randomly (adjust these values) */
+        /* Position ghosts randomly */
         #ghost-1 { top: 10%; left: 15%; animation-duration: 18s; animation-delay: 0s; }
         #ghost-2 { top: 30%; left: 80%; animation-duration: 14s; animation-delay: -5s; } /* blue */
         #ghost-3 { top: 70%; left: 50%; animation-duration: 20s; animation-delay: -10s;} /* orange */
@@ -94,47 +93,43 @@
 
         #app {
             flex: 1; /* Allows content to fill space above fixed footer */
-            position: relative; /* Needed to establish stacking context for its children if any */
-            z-index: 1; /* Ensure #app content is above #page-overlay (z-index: 0) */
         }
 
         /* Use the retro font for specific elements */
         .font-retro {
             font-family: 'Press Start 2P', cursive;
-            text-transform: uppercase; /* Retro fonts often look better uppercase */
+            text-transform: uppercase;
             letter-spacing: 2px;
         }
 
         /* Hero Section Adjustments */
         .hero-section {
-             /* background: rgba(0, 0, 0, 0.3); <-- REMOVED - Overlay is now global via #page-overlay */
-             color: #fff; /* Bright white */
+             color: #fff;
              text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
              padding-top: 3rem;
              padding-bottom: 3rem;
         }
         .hero-section h1 {
-             color: #facc15; /* Bright yellow for main title */
+             color: #facc15;
         }
         .hack-logo {
-            filter: invert(1) brightness(1.5) drop-shadow(0 0 5px #fff); /* Invert black logo and make it glow */
+            filter: invert(1) brightness(1.5) drop-shadow(0 0 5px #fff);
             max-width: 200px;
             margin-bottom: 1rem;
         }
 
 
-        /* Upload Section - Make it pop */
+        /* Upload Section */
         .upload-section {
-             background-color: rgba(31, 41, 55, 0.8); /* Slightly transparent dark grey */
-             border: 2px solid #facc15; /* Yellow border */
+             background-color: rgba(31, 41, 55, 0.8);
+             border: 2px solid #facc15;
              border-radius: 15px;
              padding: 2rem;
-             box-shadow: 0 0 20px rgba(250, 204, 21, 0.3); /* Yellow glow */
-             margin-bottom: 3rem; /* Keep margin so it doesn't touch the footer visually unless scrolled fully */
+             box-shadow: 0 0 20px rgba(250, 204, 21, 0.3);
+             margin-bottom: 3rem;
         }
         .upload-button {
-            /* --- COLORFUL BUTTON --- */
-            background: linear-gradient(45deg, #ec4899, #f97316); /* Pink to Orange */
+            background: linear-gradient(45deg, #ec4899, #f97316);
             border: none;
             color: #fff;
             padding: 1rem 1.5rem;
@@ -142,109 +137,114 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            border-radius: 50px; /* Pill shape */
+            border-radius: 50px;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
-            box-shadow: 0 5px 15px rgba(236, 72, 153, 0.4); /* Pink shadow */
+            box-shadow: 0 5px 15px rgba(236, 72, 153, 0.4);
         }
         .upload-button:hover {
             transform: translateY(-3px) scale(1.03);
             box-shadow: 0 8px 20px rgba(236, 72, 153, 0.6);
         }
-        /* Error message styling for dark mode */
+        /* Error message styling */
         .upload-form .invalid-feedback {
-            color: #fca5a5; /* Light red */
+            color: #fca5a5;
             font-weight: bold;
-            background-color: rgba(185, 28, 28, 0.7); /* Dark red background */
+            background-color: rgba(185, 28, 28, 0.7);
             padding: 0.5rem;
             border-radius: 0.25rem;
             margin-top: 0.5rem;
             text-align: center;
         }
          #fileName {
-             color: #9ca3af; /* Lighter grey for file name */
+             color: #9ca3af;
          }
-        .alert-warning { /* Style the warning message */
-            background-color: rgba(251, 191, 36, 0.2); /* Transparent yellow */
-            border-color: #facc15; /* Yellow border */
-            color: #fef3c7; /* Light yellow text */
+        .alert-warning {
+            background-color: rgba(251, 191, 36, 0.2);
+            border-color: #facc15;
+            color: #fef3c7;
         }
         .alert-warning strong {
-            color: #fef08a; /* Brighter yellow for strong */
+            color: #fef08a;
         }
-        .alert-success { /* Style the success message */
-            background-color: rgba(52, 211, 153, 0.2); /* Transparent green */
-            border-color: #34d399; /* Green border */
-            color: #d1fae5; /* Light green text */
+        .alert-success {
+            background-color: rgba(52, 211, 153, 0.2);
+            border-color: #34d399;
+            color: #d1fae5;
             text-align: center;
             font-weight: bold;
         }
 
         /* Gallery Styling */
         .gallery-section h2 {
-            color: #60a5fa; /* Bright Blue heading */
+            color: #60a5fa;
             text-shadow: 1px 1px 3px rgba(96, 165, 250, 0.5);
         }
         .gallery-section {
-             padding-bottom: 3rem; /* Add some padding below gallery title */
+             padding-bottom: 3rem;
         }
-        /* Polaroid Effect for Dark Mode */
+        /* Polaroid Effect */
         .polaroid-effect {
-            background-color: #374151; /* Dark grey card background */
+            background-color: #374151;
             padding: 10px 10px 20px 10px;
-            border: 1px solid #4b5563; /* Slightly lighter grey border */
+            border: 1px solid #4b5563;
             box-shadow: 0 4px 8px rgba(0,0,0,0.4);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             overflow: hidden;
-            border-radius: 3px; /* Subtle rounding */
+            border-radius: 3px;
         }
         .polaroid-effect:hover {
             transform: rotate(2deg) scale(1.05);
             box-shadow: 0 8px 16px rgba(0,0,0,0.6);
-            border-color: #facc15; /* Highlight border on hover */
+            border-color: #facc15;
         }
         .polaroid-effect .card-img-top { height: 200px; object-fit: cover; display:block; width: 100%;}
         .polaroid-effect .card-body { min-height: 40px; padding-top: 10px; }
-        .polaroid-effect small.text-muted { color: #9ca3af !important; } /* Override Bootstrap muted for dark */
-        .gallery-section .text-muted { color: #9ca3af !important; } /* For empty message */
+        .polaroid-effect small.text-muted { color: #9ca3af !important; }
+        .gallery-section .text-muted { color: #9ca3af !important; }
 
 
         /* Footer Styling */
         footer {
-            position: fixed; /* <<< Make footer fixed */
-            bottom: 0;       /* <<< Stick to bottom */
-            left: 0;         /* <<< Align to left */
-            width: 100%;     /* <<< Span full width */
-            background-color: #111827; /* <<< CHANGED: Fully opaque dark color */
+            position: fixed; /* Footer fijo */
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #111827; /* Color opaco */
             font-size: 0.9em;
-            color: #9ca3af; /* Grey text */
-            border-top: 1px solid #374151; /* Dark border */
-            padding-top: 1rem; /* Keep existing padding */
-            padding-bottom: 1rem; /* Keep existing padding */
-            z-index: 1; /* Ensure footer is also above the overlay */
+            color: #9ca3af;
+            border-top: 1px solid #374151;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+            z-index: 1; /* Encima del overlay (z-index: 0) */
         }
         footer a {
-            color: #60a5fa; /* Light blue links */
+            color: #60a5fa;
             text-decoration: none;
             font-weight: bold;
         }
         footer a:hover {
-            color: #93c5fd; /* Lighter blue on hover */
+            color: #93c5fd;
             text-decoration: underline;
         }
-        /* Modal Dark Mode Adjustments (Bootstrap 5 usually handles this well, but just in case) */
-        /* Modal z-index is handled by Bootstrap defaults now, should be > 1 */
+
+        /* --- CORRECCIÓN PARA EL MODAL --- */
+        /* Asegurar que el modal y su fondo estén por encima de #app (z-index: 1) y el footer (z-index: 1) */
+
+       /* --- FIN DE LA CORRECCIÓN --- */
+
+        /* Modal Dark Mode Adjustments (Estilos existentes) */
         .modal-content {
             background-color: #1f2937;
             color: #e5e7eb;
         }
         .modal-header {
-            border-bottom: 1px solid #374151; /* Dark border */
+            border-bottom: 1px solid #374151;
         }
         .modal-header .btn-close {
-            filter: invert(1) grayscale(100%) brightness(200%); /* Make close button white */
+            filter: invert(1) grayscale(100%) brightness(200%); /* Botón de cierre blanco */
         }
         .modal-title {
-            color: #60a5fa; /* Blue title */
+            color: #60a5fa; /* Título azul */
         }
 
     </style>
@@ -265,14 +265,14 @@
     {{-- Full Page Dark Overlay --}}
     <div id="page-overlay"></div>
 
-    <div id="app">
+    <div id="app"> {{-- Este div ahora tiene z-index: 1 --}}
         {{-- No Navbar --}}
         <main>
-            @yield('content')
+            @yield('content') {{-- Todo el contenido, incluyendo los modales, está dentro de #app --}}
         </main>
     </div>
 
-    {{-- Footer (now fixed position and opaque) --}}
+    {{-- Footer (ahora fijo, opaco y con z-index: 1) --}}
     <footer class="text-center py-3">
         <div class="container">
             <p class="mb-1">Biene Hunt site for Hack UPC 2025 | Used free domain from GoDaddy & MLH.</p>

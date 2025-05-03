@@ -33,6 +33,15 @@
                             </div>
                         @endif
 
+                         {{-- Error Message (for delete or other general errors) --}}
+                         @if ($errors->has('delete_error') || $errors->has('upload_error'))
+                            <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                                <i class="bi bi-exclamation-octagon-fill me-2"></i>
+                                {{ $errors->first('delete_error') ?: $errors->first('upload_error') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
+
                         {{-- Warning Message --}}
                         <div class="alert alert-warning mb-4" role="alert">
                             <i class="bi bi-exclamation-triangle-fill me-2"></i>
@@ -74,7 +83,23 @@
                 <div class="row g-4 justify-content-center">
                     @foreach ($images as $image)
                         <div class="col-sm-6 col-md-4 col-lg-3">
-                            <div class="card polaroid-effect shadow-sm">
+                            {{-- Added position:relative to contain the absolute delete button --}}
+                            <div class="card polaroid-effect shadow-sm position-relative">
+
+                                {{-- Delete Button - Visible only for user 'netraular' --}}
+                                @auth
+                                    @if (Auth::user()->name === 'netraular')
+                                        <form method="POST" action="{{ route('images.destroy', $image->id) }}" class="position-absolute top-0 end-0 p-1" style="z-index: 1;" onsubmit="return confirm('Are you absolutely sure you want to delete this Biene sighting?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm p-1" title="Delete Image">
+                                                <i class="bi bi-trash-fill" style="font-size: 0.8rem;"></i> {{-- Smaller icon --}}
+                                            </button>
+                                        </form>
+                                    @endif
+                                @endauth
+                                {{-- End Delete Button --}}
+
                                 <a href="{{ Storage::url($image->path) }}" data-bs-toggle="modal" data-bs-target="#imageModal{{ $image->id }}">
                                     <img src="{{ Storage::url($image->path) }}" class="card-img-top gallery-img" alt="Biene Sighting {{ $loop->iteration }}">
                                 </a>
@@ -114,6 +139,7 @@
 {{-- Incluir la biblioteca browser-image-compression desde un CDN --}}
 <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
 
+{{-- SCRIPT ORIGINAL: Subida y compresión de imágenes --}}
 <script>
     const fileInput = document.getElementById('image');
     const fileNameDisplay = document.getElementById('fileName');
@@ -128,7 +154,6 @@
         maxSizeMB: 2,          // Tamaño máximo objetivo después de comprimir (en MB)
         maxWidthOrHeight: 1920, // Redimensionar si es más grande que 1920px en ancho o alto
         useWebWorker: true,    // Usar Web Worker para no bloquear la interfaz
-        // initialQuality: 0.7 // Puedes ajustar la calidad inicial (0-1) si es necesario
     };
     // ---------------------
 
@@ -139,6 +164,7 @@
         submitButton.disabled = true; // Deshabilitar por defecto
         submitButton.classList.remove('pulse-animation');
         fileNameDisplay.textContent = details;
+        fileNameDisplay.style.color = '#9ca3af'; // Reset color
 
         switch (state) {
             case 'initial':
@@ -164,7 +190,7 @@
                 uploadButtonLabel.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i> Error';
                 submitButton.textContent = 'Upload Failed';
                 fileNameDisplay.textContent = message || 'An error occurred.';
-                 fileNameDisplay.style.color = '#fca5a5'; // Light red for error
+                fileNameDisplay.style.color = '#fca5a5'; // Light red for error
                 fileToUpload = null;
                 break;
         }
@@ -188,30 +214,25 @@
                 if (originalFile.size > MAX_ORIGINAL_SIZE_BYTES) {
                     fileDetails += ` - Size is large, attempting compression...`;
                     updateUploadUI('compressing', '', fileDetails);
-
                     console.log(`Original size ${originalFileSizeMB}MB exceeds limit of ${MAX_ORIGINAL_SIZE_MB}MB. Compressing...`);
 
                     try {
                         const compressedFile = await imageCompression(originalFile, COMPRESSION_OPTIONS);
-                        const compressedFileName = originalFileName; // Mantener nombre original o modificar si se quiere
+                        const compressedFileName = originalFileName;
                         const compressedFileSizeMB = (compressedFile.size / 1024 / 1024).toFixed(2);
 
                         console.log(`Compression successful. New size: ${compressedFileSizeMB}MB`);
-                        fileToUpload = new File([compressedFile], compressedFileName, { type: compressedFile.type }); // Crear objeto File
+                        fileToUpload = new File([compressedFile], compressedFileName, { type: compressedFile.type });
                         fileDetails = `Ready: ${compressedFileName} (Compressed to ${compressedFileSizeMB} MB)`;
                         updateUploadUI('ready', '', fileDetails);
 
                     } catch (error) {
                         console.error('Error during image compression:', error);
-                        updateUploadUI('error', 'Compression failed. Please try a smaller image or upload anyway if allowed.', `File: ${originalFileName}`);
-                        // Opcional: permitir subir el original si falla la compresión?
-                        // fileToUpload = originalFile;
-                        // updateUploadUI('ready', '', `Compression failed. Ready to upload original: ${originalFileName} (${originalFileSizeMB} MB)`);
-                        fileToUpload = null; // No subir si falla la compresión (más seguro)
+                        updateUploadUI('error', 'Compression failed. Please try a smaller image.', `File: ${originalFileName}`);
+                        fileToUpload = null;
                     }
 
                 } else {
-                    // El archivo no es demasiado grande, usar el original
                     console.log(`Original size ${originalFileSizeMB}MB is within limits.`);
                     fileToUpload = originalFile;
                     updateUploadUI('ready', '', fileDetails);
@@ -231,57 +252,44 @@
                 return;
             }
 
-            // Crear FormData
             const formData = new FormData();
-            formData.append('image', fileToUpload, fileToUpload.name); // Añadir el archivo (original o comprimido)
-
-            // Añadir token CSRF (leído desde la meta tag)
+            formData.append('image', fileToUpload, fileToUpload.name);
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-            // Deshabilitar botón y mostrar estado de envío
             submitButton.disabled = true;
             submitButton.textContent = 'Uploading...';
             submitButton.classList.remove('pulse-animation');
             uploadButtonLabel.innerHTML = '<i class="bi bi-cloud-arrow-up-fill me-2"></i> Sending...';
 
-
             try {
-                const response = await fetch(this.action, { // this.action es la URL del formulario
+                const response = await fetch(this.action, {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,
-                        'Accept': 'application/json' // Esperar respuesta JSON (Laravel suele enviarla en redirects con error)
+                        'Accept': 'application/json'
                     },
                     body: formData
                 });
 
                 if (response.ok) {
-                    // ¡Éxito! Laravel normalmente redirige. La página se recargará
-                    // o mostrará el mensaje flash 'success' en la recarga.
-                    // Forzar recarga para ver el mensaje flash y la nueva imagen en la galería
                      console.log('Upload successful, reloading page...');
                      window.location.reload();
-
                 } else {
-                    // Hubo un error (validación, servidor, etc.)
                     let errorMessage = 'Upload failed. Server responded with an error.';
                     try {
-                         // Intentar parsear errores de validación JSON de Laravel
                         const errorData = await response.json();
                         if (errorData.errors && errorData.errors.image) {
                             errorMessage = errorData.errors.image[0];
                         } else if (errorData.message) {
-                            errorMessage = errorData.message; // Otro tipo de error JSON
+                            errorMessage = errorData.message;
                         }
                     } catch (e) {
-                        // No era JSON o hubo otro error al parsear
                         console.error('Could not parse error response:', e);
                          errorMessage = `Upload failed. Status: ${response.status} ${response.statusText}`;
                     }
                      console.error('Upload failed:', errorMessage);
                     updateUploadUI('error', errorMessage, `File: ${fileToUpload.name}`);
                 }
-
             } catch (error) {
                  console.error('Network error or other issue during fetch:', error);
                  updateUploadUI('error', 'Network error during upload. Please check connection.', `File: ${fileToUpload.name}`);
@@ -292,13 +300,14 @@
         const styleSheet = document.styleSheets[0];
         if (styleSheet) {
             try {
-                 // Comprobar si la regla ya existe podría ser más robusto
-                 // Pero por simplicidad, intentamos insertarlas
                  let pulseExists = false;
                  let pulseAnimationExists = false;
-                 for (let i = 0; i < styleSheet.cssRules.length; i++) {
-                     if (styleSheet.cssRules[i].name === 'pulse') pulseExists = true;
-                     if (styleSheet.cssRules[i].selectorText === '.pulse-animation') pulseAnimationExists = true;
+                 // Avoid errors if cssRules is null or inaccessible (e.g., cross-origin stylesheets)
+                 if (styleSheet.cssRules) {
+                     for (let i = 0; i < styleSheet.cssRules.length; i++) {
+                         if (styleSheet.cssRules[i].type === CSSRule.KEYFRAMES_RULE && styleSheet.cssRules[i].name === 'pulse') pulseExists = true;
+                         if (styleSheet.cssRules[i].type === CSSRule.STYLE_RULE && styleSheet.cssRules[i].selectorText === '.pulse-animation') pulseAnimationExists = true;
+                     }
                  }
 
                  if (!pulseExists) {
@@ -308,19 +317,56 @@
                             50% { transform: scale(1.03); box-shadow: 0 0 15px rgba(250, 204, 21, 0.8); }
                             100% { transform: scale(1); box-shadow: 0 0 8px rgba(250, 204, 21, 0.5); }
                         }
-                    `, styleSheet.cssRules.length);
+                    `, styleSheet.cssRules ? styleSheet.cssRules.length : 0);
                  }
                  if (!pulseAnimationExists) {
-                    styleSheet.insertRule(`.pulse-animation { animation: pulse 1.5s infinite ease-in-out; }`, styleSheet.cssRules.length);
+                    styleSheet.insertRule(`.pulse-animation { animation: pulse 1.5s infinite ease-in-out; }`, styleSheet.cssRules ? styleSheet.cssRules.length : 0);
                  }
              } catch (e) {
-                 console.warn("Could not insert pulse animation rule (might already exist):", e);
+                 console.warn("Could not insert pulse animation rule (might already exist or other issue):", e);
              }
         }
 
     } else {
         console.error("One or more required elements for the upload script were not found.");
     }
+</script>
 
+
+{{-- NUEVO SCRIPT: Ocultar/Mostrar overlay con modales --}}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const pageOverlay = document.getElementById('page-overlay');
+        const modals = document.querySelectorAll('.modal');
+
+        if (pageOverlay && modals.length > 0) {
+            modals.forEach(modal => {
+                // Cuando un modal empieza a mostrarse
+                modal.addEventListener('show.bs.modal', function () {
+                    if (pageOverlay) {
+                        pageOverlay.style.display = 'none'; // Oculta el overlay
+                        // console.log('Modal shown, hiding overlay.');
+                    }
+                });
+
+                // Cuando un modal termina de ocultarse
+                modal.addEventListener('hidden.bs.modal', function () {
+                     // Pequeño retraso para dar tiempo a Bootstrap a quitar la clase 'modal-open' del body si es el último modal
+                    setTimeout(() => {
+                        // Verifica si la clase 'modal-open' ya NO está en el body
+                        if (pageOverlay && !document.body.classList.contains('modal-open')) {
+                            pageOverlay.style.display = 'block'; // Muestra el overlay SOLO si no hay otros modales abiertos
+                            // console.log('Last modal hidden, showing overlay.');
+                        } else {
+                            // console.log('Modal hidden, but another might be open. Overlay remains hidden.');
+                        }
+                    }, 50); // 50ms de retraso
+                });
+            });
+        } else {
+             if (!pageOverlay) console.error("Element #page-overlay not found for modal interaction script.");
+             if (modals.length === 0) console.warn("No modal elements found for interaction script. This might be okay if there are no modals on this specific page.");
+        }
+    });
 </script>
 @endpush

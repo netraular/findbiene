@@ -7,12 +7,20 @@ use App\Http\Controllers\HomeController; // Keep if /home is still needed for ad
 // Remove default welcome route if not used
 // Route::get('/', function () { return view('welcome'); });
 
-Auth::routes(['register' => false]); // Keep login for potential admin access? Or remove Auth::routes() entirely if no login needed AT ALL.
+// Setup authentication routes but disable registration
+Auth::routes(['register' => false]);
 
 // Home route might be irrelevant now unless used for admin panel
-Route::get('/home', [HomeController::class, 'index'])->name('home')->middleware('auth'); // Still requires auth
+// If you need an admin-only area, keep this or adapt it. Requires login.
+Route::get('/home', [HomeController::class, 'index'])->name('home')->middleware('auth');
 
 // Main image gallery and upload routes
 Route::get('/', [ImageController::class, 'index'])->name('images.index');
-// --- REMOVED middleware('auth') ---
+
+// Upload route - NO LONGER requires authentication
 Route::post('/upload', [ImageController::class, 'upload'])->name('images.upload');
+
+// --- ADDED: Route for deleting an image ---
+// Protected by 'auth' middleware. Only logged-in users can attempt.
+// Controller will verify if the specific user ('netraular') is allowed.
+Route::delete('/images/{image}', [ImageController::class, 'destroy'])->name('images.destroy')->middleware('auth');
