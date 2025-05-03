@@ -2,50 +2,33 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Image; // Importa el modelo Image
+use App\Models\Image;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage; // Para manejar el almacenamiento
+use Illuminate\Support\Facades\Storage;
 
 class ImageController extends Controller
 {
-    /**
-     * Muestra la página principal con el formulario de subida (si está logueado)
-     * y la galería de imágenes.
-     */
     public function index()
     {
-        // Obtiene las últimas 12 imágenes subidas, ordenadas por fecha de creación descendente
-        $images = Image::latest()->take(12)->get();
-
-        return view('images.index', compact('images')); // Pasamos las imágenes a la vista
+        $images = Image::latest()->take(18)->get(); // Show a few more? 18?
+        return view('images.index', compact('images'));
     }
 
-    /**
-     * Procesa la subida de la imagen.
-     */
     public function upload(Request $request)
     {
-        // Validación
         $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:4096', // Max 4MB
-            'description' => 'nullable|string|max:255', // Validación para la descripción opcional
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120', // Max 5MB
         ]);
 
-        // Guarda la imagen en storage/app/public/bienes_images
-        // Asegúrate de que la carpeta exista o se creará
         $path = $request->file('image')->store('public/bienes_images');
+        // Ensure: php artisan storage:link has been run
 
-        // Si no has ejecutado `php artisan storage:link`, hazlo ahora para
-        // que las imágenes en storage/app/public sean accesibles desde public/storage
-        // comando: php artisan storage:link
-
-        // Guarda la información en la base de datos
         $image = new Image();
         $image->path = $path;
-        $image->description = $request->input('description');
-        $image->user_id = auth()->id(); // Asigna el ID del usuario autenticado
+        // $image->user_id = auth()->id(); // REMOVED - No longer associating with logged-in user
+        $image->user_id = null; // Explicitly set to null
         $image->save();
 
-        return back()->with('success', '¡Foto de Biene subida con éxito!'); // Redirige atrás con mensaje de éxito
+        return back()->with('success', 'Biene sighting uploaded! Thanks, adventurer!');
     }
 }

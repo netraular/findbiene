@@ -1,24 +1,18 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ImageController; // Asegúrate de importar el controlador que crearemos
-use App\Http\Controllers\HomeController;  // Asegúrate de que este también esté importado
+use App\Http\Controllers\ImageController;
+use App\Http\Controllers\HomeController; // Keep if /home is still needed for admins?
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
+// Remove default welcome route if not used
+// Route::get('/', function () { return view('welcome'); });
 
-// Route::get('/', function () { // Comentamos o eliminamos la ruta welcome original
-//     return view('welcome');
-// });
+Auth::routes(['register' => false]); // Keep login for potential admin access? Or remove Auth::routes() entirely if no login needed AT ALL.
 
-Auth::routes(['register' => false]); // <-- Modificación aquí
+// Home route might be irrelevant now unless used for admin panel
+Route::get('/home', [HomeController::class, 'index'])->name('home')->middleware('auth'); // Still requires auth
 
-// La ruta /home sigue existiendo pero quizás no la uses si todo va a estar en '/'
-Route::get('/home', [HomeController::class, 'index'])->name('home')->middleware('auth');
-
-// Nuevas rutas para la página principal y la subida de imágenes
+// Main image gallery and upload routes
 Route::get('/', [ImageController::class, 'index'])->name('images.index');
-Route::post('/upload', [ImageController::class, 'upload'])->name('images.upload')->middleware('auth'); // Protegida por autenticación
+// --- REMOVED middleware('auth') ---
+Route::post('/upload', [ImageController::class, 'upload'])->name('images.upload');
