@@ -79,8 +79,11 @@
     <section class="gallery-section py-5">
         <div class="container">
             <h2 class="text-center mb-5 display-6 fw-bold font-retro">Latest Sightings</h2> {{-- Retro font --}}
-            @if($images->count())
+
+            {{-- Usa isNotEmpty() que es más adecuado para colecciones/paginadores --}}
+            @if($images->isNotEmpty())
                 <div class="row g-4 justify-content-center">
+                    {{-- El bucle @foreach funciona igual con el paginador --}}
                     @foreach ($images as $image)
                         <div class="col-sm-6 col-md-4 col-lg-3">
                             {{-- Added position:relative to contain the absolute delete button --}}
@@ -114,11 +117,12 @@
                             <div class="modal-dialog modal-lg modal-dialog-centered">
                                 <div class="modal-content"> {{-- Styles applied via layout CSS --}}
                                      <div class="modal-header">
-                                        <h5 class="modal-title font-retro" id="imageModalLabel{{ $image->id }}">Sighting #{{ $loop->iteration }}</h5>
+                                        {{-- Nota: $loop->iteration aquí será relativo a la página actual (1-10), no al total --}}
+                                        <h5 class="modal-title font-retro" id="imageModalLabel{{ $image->id }}">Sighting #{{ $image->id }}</h5> {{-- Mejor usar el ID real o calcular el número global si es necesario --}}
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body text-center">
-                                        <img src="{{ Storage::url($image->path) }}" class="img-fluid rounded" alt="Biene Sighting {{ $loop->iteration }} (Large)">
+                                        <img src="{{ Storage::url($image->path) }}" class="img-fluid rounded" alt="Biene Sighting {{ $image->id }} (Large)">
                                         <p class="mt-3"><small class="text-muted">Seen {{ $image->created_at->diffForHumans() }}</small></p>
                                     </div>
                                 </div>
@@ -126,6 +130,13 @@
                         </div>
                     @endforeach
                 </div>
+
+                {{-- *** NUEVO: Añadir enlaces de paginación *** --}}
+                <div class="d-flex justify-content-center mt-5">
+                    {{ $images->links() }}
+                </div>
+                {{-- *** FIN NUEVO *** --}}
+
             @else
                 <p class="text-center text-muted fs-5 mt-4">No Biene sightings reported yet... <br> The hunt is on! Be the first!</p>
             @endif
@@ -136,6 +147,7 @@
 @endsection
 
 @push('scripts')
+{{-- (El resto de tus scripts van aquí sin cambios) --}}
 {{-- Incluir la biblioteca browser-image-compression desde un CDN --}}
 <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
 
@@ -273,15 +285,22 @@
 
                 if (response.ok) {
                      console.log('Upload successful, reloading page...');
-                     window.location.reload();
+                     // Redirigir a la página 1 para ver la imagen subida más reciente
+                     const currentUrl = new URL(window.location.href);
+                     currentUrl.searchParams.delete('page'); // Elimina el parámetro 'page' si existe
+                     window.location.href = currentUrl.toString(); // Recarga la página base
                 } else {
                     let errorMessage = 'Upload failed. Server responded with an error.';
                     try {
                         const errorData = await response.json();
                         if (errorData.errors && errorData.errors.image) {
-                            errorMessage = errorData.errors.image[0];
+                            errorMessage = errorData.errors.image[0]; // Toma el primer error de validación de imagen
+                        } else if (errorData.errors && Object.keys(errorData.errors).length > 0) {
+                            // Toma el primer mensaje de error general si no es específico de 'image'
+                            const firstErrorKey = Object.keys(errorData.errors)[0];
+                            errorMessage = errorData.errors[firstErrorKey][0];
                         } else if (errorData.message) {
-                            errorMessage = errorData.message;
+                            errorMessage = errorData.message; // Mensaje de error genérico del backend
                         }
                     } catch (e) {
                         console.error('Could not parse error response:', e);
@@ -365,7 +384,8 @@
             });
         } else {
              if (!pageOverlay) console.error("Element #page-overlay not found for modal interaction script.");
-             if (modals.length === 0) console.warn("No modal elements found for interaction script. This might be okay if there are no modals on this specific page.");
+             // Comentado para evitar ruido si no hay modales intencionadamente:
+             // if (modals.length === 0) console.warn("No modal elements found for interaction script.");
         }
     });
 </script>

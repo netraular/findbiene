@@ -11,14 +11,14 @@ use Illuminate\Support\Facades\Auth; // Importa Auth
 class ImageController extends Controller
 {
     /**
-     * Display a listing of the images.
+     * Display a listing of the images with pagination.
      *
      * @return \Illuminate\View\View
      */
     public function index()
     {
-        // Fetch latest images, limit to 18
-        $images = Image::latest()->take(18)->get();
+        // Fetch latest images, 10 per page
+        $images = Image::latest()->paginate(10); // <--- CAMBIO AQUÍ: Usa paginate()
         return view('images.index', compact('images'));
     }
 
@@ -119,6 +119,7 @@ class ImageController extends Controller
                  Log::warning('File upload error code: ' . $request->file('image')->getError());
              }
              // Use the validation error message if available, otherwise a generic one
+             $errors = session('errors') ?: new \Illuminate\Support\MessageBag(); // Get existing errors or create empty bag
              return back()->withErrors($errors->has('image') ? $errors->all() : ['image' => 'Invalid or missing image file.']);
         }
     }

@@ -229,7 +229,32 @@
 
         /* --- CORRECCIÓN PARA EL MODAL --- */
         /* Asegurar que el modal y su fondo estén por encima de #app (z-index: 1) y el footer (z-index: 1) */
+        /* ============================= */
+        /* Dark Theme Pagination Styles  */
+        /* ============================= */
 
+        .pagination {
+             --bs-pagination-color: #9ca3af; /* Color texto normal (gris claro de tu tema) */
+             --bs-pagination-bg: #1f2937; /* Fondo (usando el de modal/upload section) */
+             --bs-pagination-border-color: #374151; /* Borde (gris oscuro de tu tema) */
+             --bs-pagination-hover-color: #e5e7eb; /* Texto hover (el gris más claro) */
+             --bs-pagination-hover-bg: #374151; /* Fondo hover (borde oscuro como base) */
+             --bs-pagination-hover-border-color: #4b5563; /* Borde hover (un poco más claro) */
+             --bs-pagination-focus-color: #e5e7eb; /* Texto focus */
+             --bs-pagination-focus-bg: #374151; /* Fondo focus */
+             --bs-pagination-focus-box-shadow: 0 0 0 0.25rem rgba(96, 165, 250, 0.3); /* Sombra focus azul (como tu gallery title) */
+             --bs-pagination-active-color: #111827; /* Texto activo (oscuro para contraste con amarillo) */
+             --bs-pagination-active-bg: #facc15; /* Fondo activo (tu amarillo característico) */
+             --bs-pagination-active-border-color: #facc15; /* Borde activo (amarillo) */
+             --bs-pagination-disabled-color: #4b5563; /* Texto deshabilitado (gris muy oscuro) */
+             --bs-pagination-disabled-bg: #111827; /* Fondo deshabilitado (el fondo base) */
+             --bs-pagination-disabled-border-color: #374151; /* Borde deshabilitado */
+        }
+
+        /* Opcional: Añadir una transición suave */
+        .pagination .page-link {
+            transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
        /* --- FIN DE LA CORRECCIÓN --- */
 
         /* Modal Dark Mode Adjustments (Estilos existentes) */
