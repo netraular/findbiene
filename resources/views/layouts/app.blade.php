@@ -275,7 +275,9 @@
     {{-- Footer (ahora fijo, opaco y con z-index: 1) --}}
     <footer class="text-center py-3">
         <div class="container">
-            <p class="mb-1">Biene Hunt site for Hack UPC 2025 | Used free domain from GoDaddy & MLH.</p>
+        <p class="mb-1">Biene Hunt site for Hack UPC 2025 | 
+        <a href="https://findbiene.raular.com/share">biene.photo</a>
+        </p>
             <p class="mb-0">Contact / More info: <a href="https://raular.com" target="_blank" rel="noopener noreferrer">raular.com</a></p>
         </div>
     </footer>

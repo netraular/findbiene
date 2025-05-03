@@ -13,7 +13,13 @@
     <style>
         /* Ghost Animation Keyframes (Screen Only) */
         @media screen {
-            @keyframes moveGhost { /* ... animación como antes ... */ }
+            @keyframes moveGhost {
+                0% { transform: translate(0, 0) rotate(0deg); opacity: 0.4; }
+                25% { transform: translate(15px, 20px) rotate(5deg); opacity: 0.6; }
+                50% { transform: translate(-10px, -15px) rotate(-3deg); opacity: 0.5; }
+                75% { transform: translate(5px, -25px) rotate(4deg); opacity: 0.7; }
+                100% { transform: translate(0, 0) rotate(0deg); opacity: 0.4; }
+            }
         }
 
         /* Base styles */
@@ -21,7 +27,7 @@
         body {
             background-color: #f8f9fa; /* Screen background */
             color: #000000;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             min-height: 100vh; text-align: center; padding: 1rem; box-sizing: border-box;
             line-height: 1.6; position: relative; overflow-x: hidden;
@@ -40,11 +46,11 @@
             }
             /* Screen positions for background ghosts */
             #ghost-1 { top: 10%; left: 15%; animation-duration: 18s; }
-            #ghost-2 { top: 30%; left: 80%; animation-duration: 14s; animation-delay: -5s; }
-            #ghost-3 { top: 70%; left: 50%; animation-duration: 20s; animation-delay: -10s;}
+            #ghost-2 { top: 30%; left: 80%; animation-duration: 14s; animation-delay: -5s; } /* blue */
+            #ghost-3 { top: 70%; left: 50%; animation-duration: 20s; animation-delay: -10s;} /* orange */
             #ghost-4 { top: 85%; left: 10%; animation-duration: 16s; animation-delay: -2s; }
-            #ghost-5 { top: 5%; left: 45%; animation-duration: 13s; animation-delay: -8s; }
-            #ghost-6 { top: 50%; left: 90%; animation-duration: 19s; animation-delay: -12s; }
+            #ghost-5 { top: 5%; left: 45%; animation-duration: 13s; animation-delay: -8s; } /* blue */
+            #ghost-6 { top: 50%; left: 90%; animation-duration: 19s; animation-delay: -12s; } /* orange */
         }
 
         /* Content wrapper - Panel Style */
@@ -78,7 +84,15 @@
         .url-text {
             font-size: 1.2rem; font-weight: 600; margin-top: 0.5rem; color: #000000;
             word-break: break-all;
-            /* No link needed if it's just text */
+            margin-bottom: 1.5rem; /* Space below URL */
+        }
+
+        /* Credit Text Styling (Screen) */
+        .credit-text {
+            font-size: 0.85rem; /* Smaller */
+            color: #6c757d;   /* Greyish color */
+            margin-top: 1.5rem; /* Space above */
+            margin-bottom: 0; /* No extra space below */
         }
 
 
@@ -95,7 +109,7 @@
 
             /* Reset content wrapper */
             .content-wrapper {
-                position: static !important; /* Let it flow naturally in print */
+                position: static !important; /* Natural flow */
                 z-index: auto !important;
                 width: 100% !important; max-width: 100% !important;
                 background-color: #ffffff !important; padding: 0 !important;
@@ -108,40 +122,51 @@
 
             /* Style the QR Print Section using Flexbox */
             .qr-print-section {
-                display: flex !important; /* <<< ACTIVATE FLEXBOX */
-                align-items: center;      /* Vertically center items */
-                justify-content: center;  /* Horizontally center the group */
-                gap: 10mm;                 /* Space between QR and ghosts */
-                margin: 10mm 0;           /* Space above/below the section */
-                page-break-inside: avoid; /* Try to keep together */
+                display: flex !important; /* ACTIVATE FLEXBOX */
+                align-items: center;      /* Vertically center */
+                justify-content: center;  /* Horizontally center */
+                gap: 10mm;                 /* Space between items */
+                margin: 10mm 0;           /* Space above/below */
+                page-break-inside: avoid; /* Keep together */
             }
 
             /* SHOW and style the print-specific ghosts */
             .print-ghost {
-                display: block !important; /* <<< MAKE VISIBLE */
+                display: block !important; /* MAKE VISIBLE */
                 width: 25mm;               /* Adjust size */
                 height: auto;
                 flex-shrink: 0; /* Prevent shrinking */
-                opacity: 0.8;   /* Optional: slight fade */
+                opacity: 0.8;   /* Optional fade */
             }
 
             /* Adjust QR code link and image within flex */
             .qr-print-section .qr-code-link {
-                 /* No specific style needed, defaults work */
                  line-height: 0; /* Prevent extra space from link */
             }
             .qr-print-section .qr-image {
                 width: 55mm; /* Adjust size */
                 max-width: 100%;
-                margin: 0 !important; /* <<< REMOVE auto margin */
+                margin: 0 !important; /* REMOVE auto margin */
             }
 
-            /* Adjust text/URL sizes for print */
+            /* Adjust text/URL/Credit sizes for print */
             .page-title { font-size: 18pt; color: #000000 !important; page-break-after: avoid; margin: 0 0 5mm 0; }
             .description { font-size: 12pt; color: #000000 !important; page-break-after: avoid; margin: 0 0 7mm 0; }
-            .url-text { font-size: 13pt; color: #000000 !important; page-break-before: avoid; margin: 5mm 0 0 0; text-align: center; }
+            .url-text { font-size: 13pt; color: #000000 !important; page-break-before: avoid; margin: 5mm 0 5mm 0; text-align: center; } /* Added bottom margin */
+            .credit-text {
+                font-size: 9pt; /* Small */
+                color: #333333 !important; /* Dark grey */
+                text-align: center;
+                margin-top: 5mm; /* Space above */
+                margin-bottom: 0;
+                page-break-before: avoid; /* Avoid starting new page with just this */
+            }
 
-            @page { margin: 15mm; size: A4; }
+            /* Define print page margins */
+            @page {
+                margin: 15mm;
+                size: A4; /* Or 'letter' */
+            }
         }
     </style>
 </head>
@@ -174,6 +199,7 @@
 
             {{-- QR Code Link --}}
             <a href="{{ url('/') }}" class="qr-code-link" title="Go to Biene Hunt!">
+                {{-- Ensure 'qr.png' is in public/images/ --}}
                 <img src="{{ asset('images/qr.png') }}" alt="QR Code for Biene Hunt website" class="qr-image">
             </a>
 
@@ -184,6 +210,11 @@
         {{-- URL Text (Non-clickable) --}}
         <p class="url-text">
             https://biene.photo
+        </p>
+
+        {{-- Credit Text --}}
+        <p class="credit-text">
+            Free domain thanks to GoDaddy & MLH
         </p>
 
     </div>
