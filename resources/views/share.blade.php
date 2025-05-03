@@ -1,91 +1,192 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <title>Comparte Biene Hunt!</title>
-
-    <!-- Fonts (Opcional, puedes usar fuentes del sistema para impresión) -->
+    <title>Share Biene Hunt!</title>
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
     <style>
-        /* Estilos específicos para esta página, optimizados para impresión */
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
+        /* Ghost Animation Keyframes (Screen Only) */
+        @media screen {
+            @keyframes moveGhost { /* ... animación como antes ... */ }
         }
+
+        /* Base styles */
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; }
         body {
-            background-color: #ffffff; /* Fondo blanco */
-            color: #000000; /* Texto negro */
-            font-family: 'Poppins', sans-serif; /* O una fuente sans-serif genérica */
-            display: flex;
-            flex-direction: column;
-            justify-content: center; /* Centrar verticalmente */
-            align-items: center; /* Centrar horizontalmente */
-            min-height: 100vh; /* Asegurar que ocupa al menos toda la altura */
-            text-align: center; /* Centrar texto */
-            padding: 20px; /* Añadir un poco de espacio alrededor */
-            box-sizing: border-box; /* Incluir padding en el tamaño total */
+            background-color: #f8f9fa; /* Screen background */
+            color: #000000;
+            font-family: 'Poppins', sans-serif;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            min-height: 100vh; text-align: center; padding: 1rem; box-sizing: border-box;
+            line-height: 1.6; position: relative; overflow-x: hidden;
         }
-        .container {
-            max-width: 500px; /* Limitar el ancho del contenido */
-        }
-        .qr-code-link img {
-            display: block; /* Para que el margen auto funcione bien */
-            margin: 20px auto; /* Espacio arriba/abajo y centrado horizontal */
-            max-width: 80%; /* Hacerlo responsivo pero no gigantesco */
-            height: auto;
-            /* Ajusta el tamaño máximo si es necesario, ej: max-width: 300px; */
-        }
-        .description {
-            font-size: 1.1em;
-            margin-bottom: 15px;
-            line-height: 1.5;
-        }
-        .url-text {
-            font-size: 1.2em;
-            font-weight: 600;
-            margin-top: 10px;
-            color: #333; /* Un gris oscuro */
-            word-break: break-all; /* Para evitar que la URL larga rompa el layout */
-        }
-        /* Media Query para impresión: Ocultar cosas innecesarias si las hubiera */
-        @media print {
-            body {
-                /* Puedes añadir ajustes específicos para impresión si es necesario */
-                padding: 5mm; /* Márgenes de impresión */
-                min-height: initial; /* No forzar altura mínima en impresión */
+
+        /* Animated Background Ghosts (Screen Only) */
+        #background-animation { display: none; /* Initially hidden, shown by screen media query */ }
+        @media screen {
+            #background-animation {
+                display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                z-index: 0; overflow: hidden; pointer-events: none;
             }
-            /* Ejemplo: @page { size: A4; margin: 10mm; } */
+            #background-animation .ghost {
+                position: absolute; width: 45px; height: auto; opacity: 0.5;
+                animation: moveGhost 15s infinite alternate ease-in-out;
+            }
+            /* Screen positions for background ghosts */
+            #ghost-1 { top: 10%; left: 15%; animation-duration: 18s; }
+            #ghost-2 { top: 30%; left: 80%; animation-duration: 14s; animation-delay: -5s; }
+            #ghost-3 { top: 70%; left: 50%; animation-duration: 20s; animation-delay: -10s;}
+            #ghost-4 { top: 85%; left: 10%; animation-duration: 16s; animation-delay: -2s; }
+            #ghost-5 { top: 5%; left: 45%; animation-duration: 13s; animation-delay: -8s; }
+            #ghost-6 { top: 50%; left: 90%; animation-duration: 19s; animation-delay: -12s; }
+        }
+
+        /* Content wrapper - Panel Style */
+        .content-wrapper {
+            position: relative; z-index: 1; max-width: 600px; width: 95%;
+            background-color: #ffffff; padding: 2rem 2.5rem; border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1); margin: 1rem 0;
+        }
+
+        /* Title, Description styles */
+        .page-title { font-size: 2rem; font-weight: 700; margin-top: 0; margin-bottom: 1.5rem; color: #1a1a1a; }
+        .description { font-size: 1.1rem; margin-bottom: 2rem; color: #333333; }
+
+        /* QR Section - Default/Screen */
+        .qr-print-section {
+             /* On screen, just acts as a container, QR centers itself */
+             margin-bottom: 1.5rem;
+        }
+        .qr-code-link { display: block; /* Keeps QR link behavior */ }
+        .qr-image {
+            display: block; margin: 0 auto; /* Center QR on screen */
+            max-width: 300px; width: 70%; height: auto;
+        }
+
+        /* Print-Specific Ghosts (Hidden on Screen) */
+        .print-ghost {
+            display: none;
+        }
+
+        /* URL Text Styling */
+        .url-text {
+            font-size: 1.2rem; font-weight: 600; margin-top: 0.5rem; color: #000000;
+            word-break: break-all;
+            /* No link needed if it's just text */
+        }
+
+
+        /* ------------- PRINT STYLES ------------- */
+        @media print {
+            html, body {
+                background-color: #ffffff !important; color: #000000 !important;
+                padding: 0 !important; font-size: 11pt; display: block !important;
+                width: 100%; height: 100%; min-height: initial;
+            }
+
+            /* HIDE animated background ghosts */
+            #background-animation { display: none !important; }
+
+            /* Reset content wrapper */
+            .content-wrapper {
+                position: static !important; /* Let it flow naturally in print */
+                z-index: auto !important;
+                width: 100% !important; max-width: 100% !important;
+                background-color: #ffffff !important; padding: 0 !important;
+                border-radius: 0 !important; box-shadow: none !important;
+                border: none !important; margin: 0 !important;
+            }
+
+             /* Keep text centered */
+            .content-wrapper h1, .content-wrapper p { text-align: center; }
+
+            /* Style the QR Print Section using Flexbox */
+            .qr-print-section {
+                display: flex !important; /* <<< ACTIVATE FLEXBOX */
+                align-items: center;      /* Vertically center items */
+                justify-content: center;  /* Horizontally center the group */
+                gap: 10mm;                 /* Space between QR and ghosts */
+                margin: 10mm 0;           /* Space above/below the section */
+                page-break-inside: avoid; /* Try to keep together */
+            }
+
+            /* SHOW and style the print-specific ghosts */
+            .print-ghost {
+                display: block !important; /* <<< MAKE VISIBLE */
+                width: 25mm;               /* Adjust size */
+                height: auto;
+                flex-shrink: 0; /* Prevent shrinking */
+                opacity: 0.8;   /* Optional: slight fade */
+            }
+
+            /* Adjust QR code link and image within flex */
+            .qr-print-section .qr-code-link {
+                 /* No specific style needed, defaults work */
+                 line-height: 0; /* Prevent extra space from link */
+            }
+            .qr-print-section .qr-image {
+                width: 55mm; /* Adjust size */
+                max-width: 100%;
+                margin: 0 !important; /* <<< REMOVE auto margin */
+            }
+
+            /* Adjust text/URL sizes for print */
+            .page-title { font-size: 18pt; color: #000000 !important; page-break-after: avoid; margin: 0 0 5mm 0; }
+            .description { font-size: 12pt; color: #000000 !important; page-break-after: avoid; margin: 0 0 7mm 0; }
+            .url-text { font-size: 13pt; color: #000000 !important; page-break-before: avoid; margin: 5mm 0 0 0; text-align: center; }
+
+            @page { margin: 15mm; size: A4; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        {{-- Descripción del sitio --}}
+
+    {{-- Animated Background Div (Only for Screen) --}}
+    <div id="background-animation">
+        <img src="{{ asset('images/yellow_ghost.svg') }}" alt="" class="ghost" id="ghost-1">
+        <img src="{{ asset('images/blue_ghost.svg') }}" alt="" class="ghost" id="ghost-2">
+        <img src="{{ asset('images/orange_ghost.svg') }}" alt="" class="ghost" id="ghost-3">
+        <img src="{{ asset('images/yellow_ghost.svg') }}" alt="" class="ghost" id="ghost-4">
+        <img src="{{ asset('images/blue_ghost.svg') }}" alt="" class="ghost" id="ghost-5">
+        <img src="{{ asset('images/orange_ghost.svg') }}" alt="" class="ghost" id="ghost-6">
+    </div>
+
+    {{-- Content Panel --}}
+    <div class="content-wrapper">
+
+        <h1 class="page-title">Join the Biene Hunt!</h1>
+
         <p class="description">
-            ¡Únete a la caza de Biene en Hack UPC!
-            Escanea el código QR o visita la web para ver los últimos avistamientos y subir los tuyos.
+            Spotted Biene at Hack UPC? Scan the QR code or visit the site below
+            to see the latest sightings and upload your own discovery.
         </p>
 
-        {{-- Enlace a la página principal envolviendo la imagen QR --}}
-        <a href="{{ url('/') }}" class="qr-code-link" title="Ir a Biene Hunt!">
-            {{-- Asegúrate de que 'qr.png' está en la carpeta public/images --}}
-            <img src="{{ asset('images/qr.png') }}" alt="Código QR para Biene Hunt">
-        </a>
+        {{-- Container for QR and Print Ghosts --}}
+        <div class="qr-print-section">
+            {{-- Left Ghost (Print Only) --}}
+            <img src="{{ asset('images/yellow_ghost.svg') }}" alt="Biene Ghost" class="print-ghost print-ghost-left">
 
-        {{-- Texto de la URL debajo del QR --}}
+            {{-- QR Code Link --}}
+            <a href="{{ url('/') }}" class="qr-code-link" title="Go to Biene Hunt!">
+                <img src="{{ asset('images/qr.png') }}" alt="QR Code for Biene Hunt website" class="qr-image">
+            </a>
+
+            {{-- Right Ghost (Print Only) --}}
+            <img src="{{ asset('images/blue_ghost.svg') }}" alt="Biene Ghost" class="print-ghost print-ghost-right">
+        </div>
+
+        {{-- URL Text (Non-clickable) --}}
         <p class="url-text">
             https://biene.photo
         </p>
 
-        {{-- Podrías añadir un pequeño logo o nota adicional si quieres --}}
-        {{-- <p style="margin-top: 30px; font-size: 0.8em; color: #555;">Hack UPC 2025</p> --}}
     </div>
+
 </body>
 </html>

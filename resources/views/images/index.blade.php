@@ -45,7 +45,7 @@
                         {{-- Warning Message --}}
                         <div class="alert alert-warning mb-4" role="alert">
                             <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                            <strong>Psst!</strong> Keep it mysterious! Try not to reveal the *whole* spot in your photo. Let others enjoy the hunt! 😉
+                            <strong>Psst!</strong> Keep it mysterious! Try not to reveal the whole spot in your photo. Let others enjoy the hunt! 😉
                         </div>
 
                         <form method="POST" action="{{ route('images.upload') }}" enctype="multipart/form-data" class="upload-form">
