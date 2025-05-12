@@ -5,11 +5,18 @@ namespace App\Http\Controllers;
 use App\Models\Image;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log; // Importa Log
-use Illuminate\Support\Facades\Auth; // Importa Auth
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class ImageController extends Controller
 {
+    /**
+     * Define si las subidas de imágenes están actualmente abiertas o cerradas.
+     * Cambia esto a 'false' cuando el evento termine.
+     * @var bool
+     */
+    private bool $submissionsOpen = false;
+
     /**
      * Display a listing of the images with pagination.
      *
@@ -18,98 +25,110 @@ class ImageController extends Controller
     public function index()
     {
         // Fetch latest images, 10 per page
-        $images = Image::latest()->paginate(10); // <--- CAMBIO AQUÍ: Usa paginate()
-        return view('images.index', compact('images'));
+        $images = Image::latest()->paginate(10);
+        $submissionsOpen = $this->submissionsOpen; // Pasa el estado a la vista
+
+        return view('images.index', compact('images', 'submissionsOpen')); // <--- PASA LA VARIABLE
     }
 
     /**
      * Handle the incoming image upload request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
     public function upload(Request $request)
     {
-        Log::info('Upload request received.');
+        // --- PRIMERA COMPROBACIÓN: ¿Están las subidas abiertas? ---
+        if (!$this->submissionsOpen) {
+            Log::warning('Upload attempt rejected: Submissions are closed.');
+            // Si la petición espera JSON (como nuestro script AJAX)
+            if ($request->expectsJson()) {
+                 return response()->json(['message' => 'Sorry, the Biene Hunt submissions are now closed.'], 403); // 403 Forbidden
+            }
+            // Para envíos de formulario normales (aunque usamos AJAX)
+            return back()->withErrors(['upload_error' => 'Sorry, the Biene Hunt submissions are now closed.']);
+        }
+        // --------------------------------------------------------
+
+        Log::info('Upload request received (Submissions are open).');
 
         // Validate the incoming file.
         $validated = $request->validate([
+            // Ajusta max si es necesario basado en tu compresión/validación JS
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120', // Max 5MB validation from Laravel
         ]);
 
         Log::info('Validation passed.');
 
-        // Check if file is present and valid (double check)
         if ($request->hasFile('image') && $request->file('image')->isValid()) {
             Log::info('File is present and valid: ' . $request->file('image')->getClientOriginalName());
 
             try {
                 $file = $request->file('image');
-                $targetDirName = 'bienes_images'; // Directory name within the public disk
-                $publicDiskPath = storage_path('app/public/' . $targetDirName); // Physical path for checks
+                $targetDirName = 'bienes_images';
+                $publicDiskPath = storage_path('app/public/' . $targetDirName);
 
                 Log::info('Attempting to store file in public disk directory: ' . $targetDirName);
-                Log::info('Physical target directory path: ' . $publicDiskPath);
-
-                // Ensure the parent directory (storage/app/public) is writable
-                if (!is_writable(storage_path('app/public'))) {
+                // (El resto de las comprobaciones de directorio y permisos permanecen igual)
+                 if (!is_writable(storage_path('app/public'))) {
                      Log::error('Storage parent directory is NOT writable: ' . storage_path('app/public'));
+                      if ($request->expectsJson()) {
+                         return response()->json(['message' => 'Server configuration error: Storage directory permissions issue.'], 500);
+                      }
                       return back()->withErrors(['upload_error' => 'Server configuration error: Storage directory permissions issue.']);
-                } else {
-                     Log::info('Storage parent directory IS writable.');
-                }
-
-                // Ensure the specific target directory exists and is writable
-                if (!file_exists($publicDiskPath)) {
-                     Log::info('Target directory does not exist, attempting to create.');
-                     if (!mkdir($publicDiskPath, 0775, true)) { // Create recursively with appropriate permissions
+                 }
+                 if (!file_exists($publicDiskPath)) {
+                     if (!mkdir($publicDiskPath, 0775, true)) {
                          Log::error('Failed to create target directory: ' . $publicDiskPath);
+                         if ($request->expectsJson()) {
+                             return response()->json(['message' => 'Server configuration error: Could not create storage directory.'], 500);
+                         }
                          return back()->withErrors(['upload_error' => 'Server configuration error: Could not create storage directory.']);
                      }
-                     Log::info('Target directory created.');
-                } elseif (!is_writable($publicDiskPath)) {
+                 } elseif (!is_writable($publicDiskPath)) {
                      Log::error('Target directory exists but is NOT writable: ' . $publicDiskPath);
+                      if ($request->expectsJson()) {
+                         return response()->json(['message' => 'Server configuration error: Cannot write to storage directory.'], 500);
+                      }
                      return back()->withErrors(['upload_error' => 'Server configuration error: Cannot write to storage directory.']);
-                } else {
-                    Log::info('Target directory exists and IS writable.');
-                }
+                 }
 
 
-                // Store the file in the 'public' disk under the 'bienes_images' directory
-                // The store method returns the path relative to the disk's root (storage/app/public)
-                // e.g., 'bienes_images/randomname.jpg'
                 $path = $file->store($targetDirName, 'public');
 
                 if ($path) {
                     Log::info('File stored successfully. Path returned by store(): ' . $path);
-                    // Confirm physical existence (optional check)
-                    if (file_exists(storage_path('app/public/' . $path))) {
-                        Log::info('CONFIRMED: Physical file exists after store() call.');
-                    } else {
-                        Log::error('ERROR: store() returned path but physical file NOT FOUND at ' . storage_path('app/public/' . $path));
-                         // Even if file not found, maybe DB record is useful? Or return error?
-                        // return back()->withErrors(['upload_error' => 'File stored but could not be confirmed physically.']);
-                    }
 
-                    // Save image details to the database
                     $image = new Image();
-                    $image->path = $path; // Store the relative path
-                    $image->user_id = null; // Set user_id to null for anonymous uploads
-                    // $image->user_id = Auth::id(); // Or assign if you require login for uploads
+                    $image->path = $path;
+                    $image->user_id = null;
                     $image->save();
                     Log::info('Database record saved for image ID: ' . $image->id);
 
-                    // Redirect back with success message
+                    // Para AJAX, devolvemos JSON con éxito
+                    if ($request->expectsJson()) {
+                         // Puedes incluir más datos si el frontend los necesita
+                         return response()->json(['success' => 'Biene sighting uploaded! Thanks, adventurer!', 'image_path' => Storage::url($path)]);
+                    }
+                    // Para fallback (no debería ocurrir con el script actual)
                     return back()->with('success', 'Biene sighting uploaded! Thanks, adventurer!');
 
                 } else {
                     Log::error('File storage failed! store() returned false or null.');
+                     if ($request->expectsJson()) {
+                         return response()->json(['message' => 'Could not save the image file.'], 500);
+                     }
                     return back()->withErrors(['upload_error' => 'Could not save the image file.']);
                 }
 
             } catch (\Exception $e) {
                 Log::error('Error during file upload process: ' . $e->getMessage());
-                Log::error($e->getTraceAsString()); // Log complete stack trace
+                Log::error($e->getTraceAsString());
+                 if ($request->expectsJson()) {
+                     // No expongas detalles del error al cliente en producción
+                     return response()->json(['message' => 'An unexpected error occurred during upload.'], 500);
+                 }
                  return back()->withErrors(['upload_error' => 'An unexpected error occurred during upload. Please check server logs.']);
             }
 
@@ -118,9 +137,16 @@ class ImageController extends Controller
              if ($request->hasFile('image')) {
                  Log::warning('File upload error code: ' . $request->file('image')->getError());
              }
-             // Use the validation error message if available, otherwise a generic one
-             $errors = session('errors') ?: new \Illuminate\Support\MessageBag(); // Get existing errors or create empty bag
-             return back()->withErrors($errors->has('image') ? $errors->all() : ['image' => 'Invalid or missing image file.']);
+             $errorMessage = 'Invalid or missing image file.';
+             // Si hay errores de validación previos, úsalos
+             if (session('errors') && session('errors')->has('image')) {
+                 $errorMessage = session('errors')->first('image');
+             }
+              if ($request->expectsJson()) {
+                 // Devuelve el error de validación específico si existe
+                 return response()->json(['message' => $errorMessage, 'errors' => ['image' => [$errorMessage]]], 422); // 422 Unprocessable Entity
+              }
+             return back()->withErrors(['image' => $errorMessage]);
         }
     }
 
@@ -133,17 +159,15 @@ class ImageController extends Controller
      */
     public function destroy(Image $image)
     {
-        // Double-check authorization: Ensure the logged-in user is specifically 'netraular'
+        // (El código de destroy no necesita cambios relacionados con la subida)
         if (!Auth::check() || Auth::user()->name !== 'netraular') {
             Log::warning('Unauthorized delete attempt for image ID: ' . $image->id . ' by user: ' . (Auth::check() ? Auth::user()->name . ' (ID: ' . Auth::id() . ')' : 'Guest'));
-            // Abort with a 403 Forbidden error page
             abort(403, 'Unauthorized action. Only the designated user can delete images.');
         }
 
         Log::info('Delete request authorized for image ID: ' . $image->id . ' by user: ' . Auth::user()->name . ' (ID: ' . Auth::id() . ')');
 
         try {
-            // Delete the file from storage (using the 'public' disk, path is relative to it)
             if (Storage::disk('public')->exists($image->path)) {
                 Storage::disk('public')->delete($image->path);
                 Log::info('Deleted file from storage: ' . $image->path);
@@ -151,17 +175,14 @@ class ImageController extends Controller
                  Log::warning('File not found in storage for deletion: ' . $image->path . ' (Continuing to delete DB record)');
             }
 
-            // Delete the record from the database
             $image->delete();
             Log::info('Deleted database record for image ID: ' . $image->id);
 
-            // Redirect back with success message
             return back()->with('success', 'Biene sighting deleted successfully!');
 
         } catch (\Exception $e) {
             Log::error('Error deleting image ID ' . $image->id . ': ' . $e->getMessage());
             Log::error($e->getTraceAsString());
-            // Redirect back with an error message
             return back()->withErrors(['delete_error' => 'Could not delete the image due to a server error. Please check logs.']);
         }
     }
