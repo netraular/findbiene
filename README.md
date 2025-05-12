@@ -1,61 +1,110 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Biene Hunt! (HackUPC 2025) 🐝📸
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+[![Hackathon](https://img.shields.io/badge/Event-HackUPC%202025-blueviolet)](https://hackupc.com/)
 
-## About Laravel
+A fun, interactive web application built during the **HackUPC 2025** hackathon. Biene Hunt allowed participants to upload and view photos of the event mascot, "Biene," creating a collaborative scavenger hunt experience across the venue.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+The project was a notable success during the event, used by **over 200 unique participants** and receiving positive feedback from attendees and organizers for enhancing the hackathon atmosphere.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**Live Demo:**
+*   **Main Site:** [https://findbiene.raular.com/](https://findbiene.raular.com/)
+*   **Share Page (QR Code):** [https://findbiene.raular.com/share](https://findbiene.raular.com/share)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## ✨ Features
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+*   **📸 Image Upload:** Simple, anonymous photo uploads of Biene sightings.
+*   **🖼️ Gallery View:** Displays the latest sightings in a paginated, visually appealing gallery (Polaroid effect!).
+*   **🚀 Fast & Efficient:** Client-side image compression before upload to save bandwidth and storage.
+*   **📱 Responsive Design:** Fully functional across desktop and mobile devices.
+*   **🔗 Shareable QR Code:** Dedicated page with a QR code for easy sharing (used for posters at the event).
+*   **🕶️ Dark Mode Theme:** Custom dark theme with subtle background animations (ghosts!).
+*   **🛡️ Moderation:** Hidden login panel for administrators (event organizers/project owner) to delete inappropriate or duplicate images.
+*   **💾 Self-Hosted:** Runs on a home lab setup, demonstrating deployment outside typical cloud providers.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 🔧 Tech Stack
 
-## Laravel Sponsors
+*   **Backend:** Laravel (PHP Framework)
+*   **Frontend:** Laravel Blade, Bootstrap 5, Vanilla JavaScript, [browser-image-compression](https://github.com/Donaldcwl/browser-image-compression)
+*   **Database:** SQL Database (e.g., MySQL/MariaDB)
+*   **Web Server:** Nginx / Apache (Configured for Laravel)
+*   **Hosting:** Home Lab
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## ⚙️ Setup and Installation (For Development/Deployment)
 
-### Premium Partners
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/YOUR_USERNAME/biene-hunt.git <!-- Replace with your repo URL -->
+    cd biene-hunt
+    ```
+2.  **Install PHP Dependencies:**
+    ```bash
+    composer install
+    ```
+3.  **Install Node.js Dependencies:**
+    ```bash
+    npm install
+    ```
+4.  **Compile Frontend Assets:**
+    ```bash
+    npm run build
+    ```
+    *(Or `npm run dev` for development)*
+5.  **Environment Configuration:**
+    *   Copy the example environment file: `cp .env.example .env`
+    *   Generate the application key: `php artisan key:generate`
+    *   Configure your database credentials (`DB_*` variables) and any other necessary settings (like `APP_URL`) in the `.env` file.
+6.  **Database Migration:**
+    ```bash
+    php artisan migrate
+    ```
+    *(You might need to create the database manually first)*
+7.  **Storage Link:**
+    *   Create the symbolic link for public file access:
+        ```bash
+        php artisan storage:link
+        ```
+8.  **Permissions:**
+    *   Ensure the `storage` and `bootstrap/cache` directories are writable by the web server.
+9.  **Web Server Configuration:**
+    *   Configure your web server (Nginx/Apache) to point the document root to the `public` directory of the project. Ensure URL rewriting is enabled (standard Laravel setup).
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development/)**
-- **[Active Logic](https://activelogic.com)**
+---
 
-## Contributing
+## 🚀 Usage
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+*   **Public Users:**
+    *   Visit the main page: [https://findbiene.raular.com/](https://findbiene.raular.com/)
+    *   Browse the gallery of recent Biene sightings.
+    *   Click "Upload Biene Photo!", select an image file (it will be compressed if large), and confirm the upload.
+    *   Visit the `/share` page ([https://findbiene.raular.com/share](https://findbiene.raular.com/share)) to get the QR code for sharing.
+*   **Admin:**
+    *   Access the designated admin login route (this route is intentionally not explicitly defined here for security).
+    *   Log in with the admin credentials.
+    *   View the image gallery with delete buttons visible next to each image.
+    *   Click the delete button (and confirm) to remove an image.
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 🎉 Hackathon Story
 
-## Security Vulnerabilities
+This project was born out of the HackUPC 2025 hackathon. The idea was to create a fun, interactive element related to the event's mascot, Biene. By allowing participants to share their findings, it aimed to foster a sense of community and add a playful layer to the intense coding environment. The positive reception and high usage were fantastic validation of this goal.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-## License
+## 🤝 Contributing
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Contributions, issues, and feature requests are welcome! Feel free to check [issues page](https://github.com/netraular/findbiene/issues) .
+
+---
+
+## 📜 License
+
+This project is open-sourced under the [MIT License](LICENSE).
+
+---
+
+Created with ❤️ during HackUPC 2025 by [raular](https://raular.com)
