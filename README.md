@@ -15,10 +15,9 @@ The project was a notable success during the event, used by **over 200 unique pa
 
 ## 📸 Project Showcase
 
-| Main Page                                     | Gallery View                                      | Meeting the Organizers                     |
+| Main Page                                     | Gallery View                                      | Image from the Organizers                     |
 | :--------------------------------------------: | :-----------------------------------------------: | :--------------------------------------: |
 | ![Biene Hunt Main Page](/images/hero_banner.png) | ![Biene Hunt Gallery](/images/gallery.png) | ![Biene Hunt Organizers](/images/organizers.jpg) |
-*<p align="center">Showcasing the user interface and a moment with the HackUPC team.</p>*
 
 ---
 
