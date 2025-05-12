@@ -1,6 +1,7 @@
 # Biene Hunt! (HackUPC 2025) 🐝📸
 
 [![Hackathon](https://img.shields.io/badge/Event-HackUPC%202025-blueviolet)](https://hackupc.com/)
+[![Devpost](https://img.shields.io/badge/Devpost-Submission-003E54?logo=devpost)](https://devpost.com/software/find-biene) <!-- Added Devpost Badge -->
 
 A fun, interactive web application built during the **HackUPC 2025** hackathon. Biene Hunt allowed participants to upload and view photos of the event mascot, "Biene," creating a collaborative scavenger hunt experience across the venue.
 
@@ -9,6 +10,15 @@ The project was a notable success during the event, used by **over 200 unique pa
 **Live Demo:**
 *   **Main Site:** [https://findbiene.raular.com/](https://findbiene.raular.com/)
 *   **Share Page (QR Code):** [https://findbiene.raular.com/share](https://findbiene.raular.com/share)
+
+---
+
+## 📸 Project Showcase
+
+| Main Page                                     | Gallery View                                      | Meeting the Organizers                     |
+| :--------------------------------------------: | :-----------------------------------------------: | :--------------------------------------: |
+| ![Biene Hunt Main Page](/images/hero_banner.png) | ![Biene Hunt Gallery](/images/gallery.png) | ![Biene Hunt Organizers](/images/organizers.jpg) |
+*<p align="center">Showcasing the user interface and a moment with the HackUPC team.</p>*
 
 ---
 
@@ -32,14 +42,15 @@ The project was a notable success during the event, used by **over 200 unique pa
 *   **Database:** SQL Database (e.g., MySQL/MariaDB)
 *   **Web Server:** Nginx / Apache (Configured for Laravel)
 *   **Hosting:** Home Lab
+
 ---
 
 ## ⚙️ Setup and Installation (For Development/Deployment)
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/YOUR_USERNAME/biene-hunt.git <!-- Replace with your repo URL -->
-    cd biene-hunt
+    git clone https://github.com/netraular/findbiene.git
+    cd findbiene
     ```
 2.  **Install PHP Dependencies:**
     ```bash
@@ -94,10 +105,11 @@ The project was a notable success during the event, used by **over 200 unique pa
 
 This project was born out of the HackUPC 2025 hackathon. The idea was to create a fun, interactive element related to the event's mascot, Biene. By allowing participants to share their findings, it aimed to foster a sense of community and add a playful layer to the intense coding environment. The positive reception and high usage were fantastic validation of this goal.
 
+---
 
 ## 🤝 Contributing
 
-Contributions, issues, and feature requests are welcome! Feel free to check [issues page](https://github.com/netraular/findbiene/issues) .
+Contributions, issues, and feature requests are welcome! Feel free to check [issues page](https://github.com/netraular/findbiene/issues).
 
 ---
 

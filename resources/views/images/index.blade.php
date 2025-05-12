@@ -17,7 +17,7 @@
     </section>
 
     {{-- Upload Section --}}
-    <section class="py-5"> {{-- Remove upload-section class, apply styles directly or via parent --}}
+    <section class="py-5"> 
         <div class="container">
             <div class="row justify-content-center">
                  {{-- Apply upload-section styling to this column --}}
@@ -70,23 +70,28 @@
                         </form>
                     </div>
                 </div>
+                <div class="text-center"> {{-- Contenedor para centrar y añadir margen inferior --}}
+                    <img src="{{ asset('images/organizers.jpg') }}"
+                        alt="Meeting the HackUPC Organizers"
+                        class="img-fluid rounded shadow-sm" {{-- Clases Bootstrap: responsiva, redondeada, sombra suave --}}
+                        style="max-height: 450px; max-width: 100%;"> {{-- Opcional: Limitar tamaño si es muy grande --}}
+                    <p class="text-muted mt-2 fst-italic"><small>A quick picture from the amazing HackUPC team!</small></p> {{-- Caption opcional --}}
+                </div>
             </div>
         </div>
     </section>
 
 
-    {{-- Gallery Section --}}
+{{-- Gallery Section --}}
     <section class="gallery-section py-5">
         <div class="container">
             <h2 class="text-center mb-5 display-6 fw-bold font-retro">Latest Sightings</h2> {{-- Retro font --}}
-
-            {{-- Usa isNotEmpty() que es más adecuado para colecciones/paginadores --}}
             @if($images->isNotEmpty())
                 <div class="row g-4 justify-content-center">
                     {{-- El bucle @foreach funciona igual con el paginador --}}
                     @foreach ($images as $image)
-                        <div class="col-sm-6 col-md-4 col-lg-3">
-                            {{-- Added position:relative to contain the absolute delete button --}}
+                        {{-- ... (código de la tarjeta de imagen sin cambios) ... --}}
+                         <div class="col-sm-6 col-md-4 col-lg-3">
                             <div class="card polaroid-effect shadow-sm position-relative">
 
                                 {{-- Delete Button - Visible only for user 'netraular' --}}
@@ -96,15 +101,14 @@
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger btn-sm p-1" title="Delete Image">
-                                                <i class="bi bi-trash-fill" style="font-size: 0.8rem;"></i> {{-- Smaller icon --}}
+                                                <i class="bi bi-trash-fill" style="font-size: 0.8rem;"></i>
                                             </button>
                                         </form>
                                     @endif
                                 @endauth
-                                {{-- End Delete Button --}}
 
                                 <a href="{{ Storage::url($image->path) }}" data-bs-toggle="modal" data-bs-target="#imageModal{{ $image->id }}">
-                                    <img src="{{ Storage::url($image->path) }}" class="card-img-top gallery-img" alt="Biene Sighting {{ $loop->iteration }}">
+                                    <img src="{{ Storage::url($image->path) }}" class="card-img-top gallery-img" alt="Biene Sighting {{ $image->id }}">
                                 </a>
                                 <div class="card-body text-center p-2">
                                     <small class="text-muted">Seen {{ $image->created_at->diffForHumans() }}</small>
@@ -114,11 +118,10 @@
 
                          <!-- Modal -->
                         <div class="modal fade" id="imageModal{{ $image->id }}" tabindex="-1" aria-labelledby="imageModalLabel{{ $image->id }}" aria-hidden="true">
-                            <div class="modal-dialog modal-lg modal-dialog-centered">
-                                <div class="modal-content"> {{-- Styles applied via layout CSS --}}
+                             <div class="modal-dialog modal-lg modal-dialog-centered">
+                                 <div class="modal-content">
                                      <div class="modal-header">
-                                        {{-- Nota: $loop->iteration aquí será relativo a la página actual (1-10), no al total --}}
-                                        <h5 class="modal-title font-retro" id="imageModalLabel{{ $image->id }}">Sighting #{{ $image->id }}</h5> {{-- Mejor usar el ID real o calcular el número global si es necesario --}}
+                                        <h5 class="modal-title font-retro" id="imageModalLabel{{ $image->id }}">Sighting #{{ $image->id }}</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body text-center">
@@ -131,11 +134,10 @@
                     @endforeach
                 </div>
 
-                {{-- *** NUEVO: Añadir enlaces de paginación *** --}}
+                {{-- Enlaces de paginación --}}
                 <div class="d-flex justify-content-center mt-5">
                     {{ $images->links() }}
                 </div>
-                {{-- *** FIN NUEVO *** --}}
 
             @else
                 <p class="text-center text-muted fs-5 mt-4">No Biene sightings reported yet... <br> The hunt is on! Be the first!</p>
